@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Portfolio: Meta Ads Manager IA Improvement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: "Meta Clean" - Slate (Base), Blue (Primary #1877F2), Teal (Success), Red (Error) -->
+    <!-- Application Structure Plan:
+         1. Hero Section: Project Title, Role, Duration, and high-level Goal.
+         2. Problem Space: 3 Cards highlighting the core structural issues (focusing on Irreversibility).
+         3. User Research (Persona & Journey): Visualized Persona card and a CSS-based Customer Journey Map showing the emotional dip.
+         4. Solution Concepts: Visual representation of the "Account Map" and "Contextual Warnings".
+         5. Business Impact: Bar charts projecting the expected improvements in efficiency and error reduction.
+    -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #F0F2F5; color: #1C1E21; }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #DADDE1;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Journey Map Styling */
+        .journey-point {
+            position: relative;
+            z-index: 10;
+        }
+        .journey-line {
+            position: absolute;
+            top: 2rem;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #E4E6EB;
+            z-index: 0;
+        }
+        
+        /* Tree Node Styling for Solution */
+        .tree-node {
+            background: #FFFFFF;
+            border: 1px solid #CCD0D5;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px 0;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .tree-connector {
+            width: 2px;
+            background: #CCD0D5;
+            margin: 0 auto;
+        }
+        .tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        .tree-row {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            gap: 12px;
+        }
+        .node-label {
+            margin-left: 6px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- LANGUAGE TOGGLE -->
+    <div class="fixed top-6 right-6 z-50 flex bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <button onclick="switchLang('ja')" id="btn-ja" class="px-4 py-2 text-sm font-bold transition-colors bg-blue-600 text-white">JA</button>
+        <button onclick="switchLang('en')" id="btn-en" class="px-4 py-2 text-sm font-bold transition-colors text-gray-600 hover:bg-gray-100">EN</button>
+    </div>
+
+    <!-- HERO SECTION -->
+    <header class="bg-white pb-12 pt-20 px-6 border-b border-gray-200">
+        <div class="max-w-5xl mx-auto">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">UX Portfolio Case Study</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full" id="tx-date">Dec 2025</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-6 text-gray-900 leading-tight" id="tx-title">
+                Meta Ads Manager: <br>
+                <span class="text-blue-600">Account Structure & IA Improvement</span>
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mb-8 leading-relaxed" id="tx-summary">
+                Redesigning the Information Architecture to eliminate structural confusion, prevent irreversible setup errors, and empower users to manage campaigns with confidence.
+            </p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-gray-100 pt-6">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">My Role</p>
+                    <p class="font-bold text-gray-800" id="tx-role">Technical Support / UX Designer</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Focus</p>
+                    <p class="font-bold text-gray-800" id="tx-focus">Information Architecture (IA)</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Duration</p>
+                    <p class="font-bold text-gray-800" id="tx-duration">1 Week Sprint</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Tools</p>
+                    <p class="font-bold text-gray-800">Figma, Usability Testing</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-16 space-y-20">
+
+        <!-- 1. THE PROBLEM -->
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <span class="bg-red-100 text-red-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                <span id="tx-h-problem">The Core Problem</span>
+            </h2>
+            <p class="text-gray-600 mb-8 ml-11" id="tx-problem-desc">
+                Users cannot intuitively understand the complex linking between assets (Ad Accounts, Business Portfolios, Pixels). This invisible hierarchy leads to critical operational failures.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 ml-11">
+                <!-- Problem 1 -->
+                <div class="card p-6 border-t-4 border-t-gray-400">
+                    <div class="text-3xl mb-4">😰</div>
+                    <h3 class="font-bold text-gray-800 mb-2" id="tx-prob1-t">Anxiety & Misoperation</h3>
+                    <p class="text-sm text-gray-600" id="tx-prob1-d">"Is this the right place?" Users hesitate to make changes due to unclear impact scope.</p>
+                </div>
+                <!-- Problem 2 -->
+                <div class="card p-6 border-t-4 border-t-gray-400">
+                    <div class="text-3xl mb-4">🏚️</div>
+                    <h3 class="font-bold text-gray-800 mb-2" id="tx-prob2-t">Inefficient Operations</h3>
+                    <p class="text-sm text-gray-600" id="tx-prob2-d">Duplicate accounts and chaotic structures make analysis and handover impossible.</p>
+                </div>
+                <!-- Problem 3 (Crucial Correction applied here) -->
+                <div class="card p-6 border-t-4 border-t-red-500 bg-red-50">
+                    <div class="text-3xl mb-4">🔒</div>
+                    <h3 class="font-bold text-red-700 mb-2" id="tx-prob3-t">Fatal Irreversibility</h3>
+                    <p class="text-sm text-red-800" id="tx-prob3-d">
+                        **The link between an Ad Account and a Business Portfolio is irreversible.** This permanently blocks permission handover if an admin leaves.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. USER RESEARCH (PERSONA & JOURNEY) -->
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                <span id="tx-h-research">User Research & Persona</span>
+            </h2>
+            
+            <!-- Persona Card -->
+            <div class="ml-11 mt-8 mb-12 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col md:flex-row">
+                <div class="bg-gray-100 p-8 md:w-1/3 flex flex-col items-center justify-center text-center border-r border-gray-200">
+                    <div class="w-24 h-24 bg-blue-200 rounded-full flex items-center justify-center text-4xl mb-4">👩🏻‍💼</div>
+                    <h3 class="text-xl font-bold text-gray-800" id="tx-p-name">Aya (32)</h3>
+                    <p class="text-sm text-gray-500 mb-4" id="tx-p-role">Marketing @ EC Company</p>
+                    <div class="text-xs bg-white px-3 py-1 rounded-full border border-gray-300">Mid-level Operator</div>
+                </div>
+                <div class="p-8 md:w-2/3">
+                    <h4 class="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2" id="tx-p-context-h">Context</h4>
+                    <p class="text-sm text-gray-600 mb-6" id="tx-p-context">Entrusted with operations by a novice owner, but stuck because she logged into an account that is disconnected from the business structure. Ads are stopped.</p>
+                    
+                    <h4 class="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2" id="tx-p-frust-h">Frustrations</h4>
+                    <ul class="text-sm text-red-600 space-y-2 font-medium">
+                        <li id="tx-p-frust-1">"I'm too scared to touch settings."</li>
+                        <li id="tx-p-frust-2">"I don't know which setting affects what."</li>
+                        <li id="tx-p-frust-3">"I can't define the rules myself."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- CSS Journey Map -->
+            <div class="ml-11">
+                <h3 class="text-lg font-bold text-gray-800 mb-6" id="tx-h-journey">User Journey: The Path to Despair</h3>
+                <div class="relative py-10">
+                    <div class="journey-line"></div>
+                    <div class="grid grid-cols-4 gap-4">
+                        <!-- Phase 1 -->
+                        <div class="journey-point flex flex-col items-center text-center">
+                            <div class="w-12 h-12 rounded-full bg-green-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😊</div>
+                            <h4 class="font-bold text-sm mb-1" id="tx-j1-t">Planning</h4>
+                            <p class="text-xs text-gray-500" id="tx-j1-d">New campaign needs arise.</p>
+                        </div>
+                        <!-- Phase 2 -->
+                        <div class="journey-point flex flex-col items-center text-center">
+                            <div class="w-12 h-12 rounded-full bg-yellow-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😐</div>
+                            <h4 class="font-bold text-sm mb-1" id="tx-j2-t">Structure Check</h4>
+                            <p class="text-xs text-gray-500" id="tx-j2-d">Using existing account (Personal?). Can't find Business Settings.</p>
+                        </div>
+                        <!-- Phase 3 -->
+                        <div class="journey-point flex flex-col items-center text-center">
+                            <div class="w-12 h-12 rounded-full bg-orange-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😡</div>
+                            <h4 class="font-bold text-sm mb-1 text-orange-600" id="tx-j3-t">Forced Misdirection</h4>
+                            <p class="text-xs text-orange-600 font-bold" id="tx-j3-d">Forced to "Select Business" screen, but account is not linked. Context Lost.</p>
+                        </div>
+                        <!-- Phase 4 -->
+                        <div class="journey-point flex flex-col items-center text-center">
+                            <div class="w-12 h-12 rounded-full bg-red-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😭</div>
+                            <h4 class="font-bold text-sm mb-1 text-red-700" id="tx-j4-t">Operational Block</h4>
+                            <p class="text-xs text-red-700 font-bold" id="tx-j4-d">Cannot link due to "Same Email". Irreversible setup creates permanent risk.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SOLUTION CONCEPTS -->
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <span class="bg-teal-100 text-teal-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                <span id="tx-h-solution">Design Solution Concepts</span>
+            </h2>
+            <p class="text-gray-600 mb-8 ml-11" id="tx-sol-desc">
+                To solve "Invisible Hierarchy," I propose visualizing the structure and providing explicit context warnings.
+            </p>
+
+            <div class="ml-11 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Concept 1: Account Map -->
+                <div class="card p-6 md:col-span-2">
+                    <h3 class="font-bold text-blue-700 mb-4" id="tx-sol1-t">1. Account Map (Hierarchy Visualization)</h3>
+                    
+                    <!-- NEW DETAILED TREE VISUALIZATION (HTML/CSS) -->
+                    <div class="bg-slate-50 border border-slate-200 rounded p-6 mb-4 overflow-x-auto">
+                        <div class="min-w-[500px] tree-container">
+                            
+                            <!-- 1. Root Node: Business Portfolio -->
+                            <div class="tree-node border-blue-500 bg-blue-100 text-blue-700 px-6 py-3">
+                                🏢<span class="node-label" id="tx-map-business">ビジネスポートフォリオ</span>
+                            </div>
+                            
+                            <div class="tree-connector h-6"></div>
+                            <div class="tree-connector h-4 bg-blue-400"></div>
+                            <div class="tree-connector h-4"></div>
+                            
+                            <!-- 2. Ad Account (Mid Node) -->
+                            <div class="tree-node border-gray-500 bg-white text-gray-800 px-6 py-3">
+                                💰<span class="node-label" id="tx-map-ad-account">広告アカウント</span>
+                            </div>
+                            <!-- Irreversibility Warning -->
+                            <p class="text-xs text-red-500 mt-1 font-bold" id="tx-map-irreversible">← **この紐づきが不可逆性の課題**</p>
+                            
+                            <div class="tree-connector h-6"></div>
+
+                            <!-- 3. Branching: Assets (Vertical Connectors) -->
+                            <div class="tree-row mt-4">
+                                <div class="w-1/3 flex flex-col items-center">
+                                    <div class="tree-connector h-4"></div>
+                                    <div class="tree-node bg-teal-50 border-teal-300 text-teal-700">
+                                        📊<span class="node-label" id="tx-map-pixel">Facebook Pixel</span>
+                                    </div>
+                                </div>
+                                <div class="w-1/3 flex flex-col items-center">
+                                    <div class="tree-connector h-4"></div>
+                                    <div class="tree-node bg-teal-50 border-teal-300 text-teal-700">
+                                        🔗<span class="node-label" id="tx-map-page">FB Page / IG Account</span>
+                                    </div>
+                                </div>
+                                <div class="w-1/3 flex flex-col items-center">
+                                    <div class="tree-connector h-4"></div>
+                                    <div class="tree-node bg-teal-50 border-teal-300 text-teal-700">
+                                        🛍️<span class="node-label" id="tx-map-catalog">Catalog</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tree-connector h-6"></div>
+                            
+                            <!-- 4. Lower Node: Campaign -->
+                            <div class="tree-node border-gray-400 bg-white text-gray-800 px-6 py-3">
+                                📣<span class="node-label" id="tx-map-campaign">Campaign / Ad Set / Ad (運用)</span>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- / NEW DETAILED TREE VISUALIZATION -->
+
+                    <p class="text-sm text-gray-600" id="tx-sol1-d">
+                        Always display the hierarchy tree at the top of the screen. Highlight the current editing level to prevent context loss.
+                    </p>
+                </div>
+
+                <!-- Concept 2: Health Check & Warning (Remains as 1/2 width) -->
+                <div class="card p-6">
+                    <h3 class="font-bold text-blue-700 mb-4" id="tx-sol2-t">2. Structural Health Check</h3>
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-4 rounded-r">
+                        <p class="font-bold text-amber-800 text-xs mb-1">⚠️ Structural Warning</p>
+                        <p class="text-xs text-amber-900" id="tx-sol2-mock">
+                            "This Ad Account is NOT linked to the Business Portfolio. Linking is currently blocked."
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-600" id="tx-sol2-d">
+                        Proactively warn users about structural issues (e.g., isolation, permission conflicts) on the dashboard to prevent dead-ends.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. EXPECTED RESULTS (KPIs) -->
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
+                <span id="tx-h-impact">Expected Business Impact</span>
+            </h2>
+            <div class="ml-11 mt-8 card p-8">
+                <h3 class="font-bold text-gray-700 mb-6 text-center" id="tx-chart-title">Target Improvements</h3>
+                <div class="chart-container">
+                    <canvas id="impactChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-12 mt-12 text-center text-gray-500 text-sm">
+        <p>UX Portfolio Case Study | 2025</p>
+    </footer>
+
+    <script>
+        const content = {
+            ja: {
+                date: "2025年12月",
+                title: "Meta Ads Manager: <br><span class=\"text-blue-600\">アカウント構造とIAの改善</span>",
+                summary: "情報アーキテクチャ(IA)を再設計し、構造的な混乱を解消。不可逆的な設定ミスを防ぎ、ユーザーが安心してキャンペーンを管理できる状態を目指す。",
+                role: "テクニカルサポート / UXデザイナー",
+                focus: "情報アーキテクチャ (IA)",
+                duration: "2025年12月3日 – 2025年12月10日 (1週間のスプリント)",
+                h_problem: "課題の核心",
+                problem_desc: "ユーザーは、広告アカウント、ビジネスポートフォリオ、ピクセルなどのアセット間の複雑な紐づきを直感的に理解できません。この「見えない階層」が、致命的な運用ミスを引き起こしています。",
+                prob1_t: "誤操作への不安",
+                prob1_d: "「ここを変えて大丈夫？」影響範囲が見えないため、変更をためらい作業が停滞する。",
+                prob2_t: "非効率な運用",
+                prob2_d: "構造が理解できないため、同じ設定の複製ばかり増え、分析や引き継ぎが困難になる。",
+                prob3_t: "致命的な不可逆性",
+                prob3_d: "**「広告アカウント」と「ビジネスポートフォリオ」の紐づきは一度行うと解除できません。** これにより、管理者が退職した際などに権限移譲が永久にブロックされるリスクがあります。",
+                h_research: "ユーザーリサーチ & ペルソナ",
+                p_name: "佐藤 彩 (32)",
+                p_role: "EC事業会社 マーケティング担当",
+                p_context_h: "状況",
+                p_context: "初心者のオーナーから運用を任されたが、ビジネス構造と切り離されたアカウントでログインしてしまい、操作に行き詰まっている。",
+                p_frust_h: "不満・課題",
+                p_frust_1: "「怖くて設定画面を触れない」",
+                p_frust_2: "「どの設定がどこに効くのか分からない」",
+                p_frust_3: "「自分ではルールを決められない」",
+                h_journey: "ユーザージャーニー：絶望への道のり",
+                j1_t: "企画",
+                j1_d: "新しいキャンペーンのニーズ発生",
+                j2_t: "構造検討",
+                j2_d: "既存アカウントを使用（個人？）。ビジネス設定が見当たらない。",
+                j3_t: "強制的な誤誘導",
+                j3_d: "「ビジネスを選択」画面に強制遷移させられるが、紐づくアカウントがないため操作不能に陥る。",
+                j4_t: "運用ブロック",
+                j4_d: "「同一メアド」エラーや、広告アカウントとビジネスポートフォリオの不可逆な紐づきにより、解決不能な状態に。",
+                h_solution: "デザイン解決策のコンセプト",
+                sol_desc: "「見えない階層」を解決するため、構造の視覚化と、文脈に応じた警告表示を提案します。",
+                sol1_t: "1. アカウントマップ（階層の視覚化）",
+                sol1_d: "画面上部に階層ツリーを常時表示。現在地と親子関係をハイライトし、コンテキストの喪失（迷子）を防ぐ。",
+                sol2_t: "2. 構造の健康状態チェック",
+                sol2_mock: "「この広告アカウントはビジネスポートフォリオに紐づいていません。機能が制限されます」",
+                sol2_d: "「孤立したアカウント」や「権限の競合」などの構造的問題を、行き止まりになる前にダッシュボードで警告する。",
+                h_impact: "期待されるビジネスインパクト",
+                chart_title: "改善目標値 (KPI)",
+                chart_labels: ["タスク完了時間短縮", "構造起因のエラー削減", "構造理解度(SUS)"],
+                legend_current: "現状",
+                legend_target: "目標",
+                // New Map Node Labels
+                map_business: "🏢 ビジネスポートフォリオ",
+                map_ad_account: "💰 広告アカウント",
+                map_pixel: "📊 Facebook Pixel",
+                map_page: "🔗 FB Page / IG Account",
+                map_catalog: "🛍️ Catalog",
+                map_campaign: "📣 Campaign / Ad Set / Ad (運用)",
+                map_irreversible: "← **この紐づきが不可逆性の課題**"
+            },
+            en: {
+                date: "Dec 2025",
+                title: "Meta Ads Manager: <br><span class=\"text-blue-600\">Account Structure & IA Improvement</span>",
+                summary: "Redesigning the Information Architecture to eliminate structural confusion, prevent irreversible setup errors, and empower users to manage campaigns with confidence.",
+                role: "Technical Support / UX Designer",
+                focus: "Information Architecture (IA)",
+                duration: "December 3 – December 10, 2025 (1 Week Sprint)",
+                h_problem: "The Core Problem",
+                problem_desc: "Users cannot intuitively understand the complex linking between assets (Ad Accounts, Business Portfolios, Pixels). This invisible hierarchy leads to critical operational failures.",
+                prob1_t: "Anxiety & Misoperation",
+                prob1_d: "\"Is this the right place?\" Users hesitate to make changes due to unclear impact scope.",
+                prob2_t: "Inefficient Operations",
+                prob2_d: "Duplicate accounts and chaotic structures make analysis and handover impossible.",
+                prob3_t: "Fatal Irreversibility",
+                prob3_d: "**The link between an Ad Account and a Business Portfolio is irreversible.** This permanently blocks permission handover if an admin leaves.",
+                h_research: "User Research & Persona",
+                p_name: "Aya (32)",
+                p_role: "Marketing @ EC Company",
+                p_context_h: "Context",
+                p_context: "Entrusted with operations by a novice owner, but stuck because she logged into an account that is disconnected from the business structure. Ads are stopped.",
+                p_frust_h: "Frustrations",
+                p_frust_1: "\"I'm too scared to touch settings.\"",
+                p_frust_2: "\"I don't know which setting affects what.\"",
+                p_frust_3: "\"I can't define the rules myself.\"",
+                h_journey: "User Journey: The Path to Despair",
+                j1_t: "Planning",
+                j1_d: "New campaign needs arise.",
+                j2_t: "Structure Check",
+                j2_d: "Using existing account (Personal?). Can't find Business Settings.",
+                j3_t: "Forced Misdirection",
+                j3_d: "Forced to \"Select Business\" screen, but account is not linked. Context Lost.",
+                j4_t: "Operational Block",
+                j4_d: "Blocked by \"Same Email\" error or irreversible Ad Account-Business Portfolio linking risk.",
+                h_solution: "Design Solution Concepts",
+                sol_desc: "To solve \"Invisible Hierarchy,\" I propose visualizing the structure and providing explicit context warnings.",
+                sol1_t: "1. Account Map (Hierarchy Visualization)",
+                sol1_d: "Always display the hierarchy tree at the top. Highlight the current editing level to prevent context loss.",
+                sol2_t: "2. Structural Health Check",
+                sol2_mock: "\"This Ad Account is NOT linked to the Business Portfolio. Features are limited.\"",
+                sol2_d: "Proactively warn users about structural issues (e.g., isolation, permission conflicts) before they hit a dead-end.",
+                h_impact: "Expected Business Impact",
+                chart_title: "Target Improvements",
+                chart_labels: ["Time Reduction", "Error Reduction", "Understanding (SUS)"],
+                legend_current: "Current",
+                legend_target: "Target",
+                // New Map Node Labels
+                map_business: "🏢 Business Portfolio",
+                map_ad_account: "💰 Ad Account",
+                map_pixel: "📊 Facebook Pixel",
+                map_page: "🔗 FB Page / IG Account",
+                map_catalog: "🛍️ Catalog",
+                map_campaign: "📣 Campaign / Ad Set / Ad",
+                map_irreversible: "← **This link is Irreversible**"
+            }
+        };
+
+        let currentLang = 'ja';
+        let impactChart;
+
+        function initChart() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            if(impactChart) impactChart.destroy();
+
+            impactChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: content[currentLang].chart_labels,
+                    datasets: [
+                        {
+                            label: content[currentLang].legend_current,
+                            data: [0, 40, 40], // Baseline (illustrative)
+                            backgroundColor: '#CBD5E1', 
+                            borderRadius: 4
+                        },
+                        {
+                            label: content[currentLang].legend_target,
+                            data: [30, 10, 80], // Targets: 30% reduction, Error down to 10%, SUS up to 80
+                            backgroundColor: '#2563EB', // Blue 600
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: '#F3F4F6' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+        
+        function updateMapLabels(lang) {
+            const t = content[lang];
+            const mapElements = {
+                'tx-map-business': t.map_business,
+                'tx-map-ad-account': t.map_ad_account,
+                'tx-map-pixel': t.map_pixel,
+                'tx-map-page': t.map_page,
+                'tx-map-catalog': t.map_catalog,
+                'tx-map-campaign': t.map_campaign,
+                'tx-map-irreversible': t.map_irreversible
+            };
+
+            for (const id in mapElements) {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = mapElements[id];
+            }
+        }
+
+
+        function switchLang(lang) {
+            currentLang = lang;
+            const t = content[lang];
+            
+            // Text Updates
+            const ids = [
+                'tx-date', 'tx-title', 'tx-summary', 'tx-role', 'tx-focus', 'tx-duration',
+                'tx-h-problem', 'tx-problem-desc', 'tx-prob1-t', 'tx-prob1-d', 'tx-prob2-t', 'tx-prob2-d', 'tx-prob3-t', 'tx-prob3-d',
+                'tx-h-research', 'tx-p-name', 'tx-p-role', 'tx-p-context-h', 'tx-p-context', 'tx-p-frust-h', 'tx-p-frust-1', 'tx-p-frust-2', 'tx-p-frust-3',
+                'tx-h-journey', 'tx-j1-t', 'tx-j1-d', 'tx-j2-t', 'tx-j2-d', 'tx-j3-t', 'tx-j3-d', 'tx-j4-t', 'tx-j4-d',
+                'tx-h-solution', 'tx-sol-desc', 'tx-sol1-t', 'tx-sol1-d', 'tx-sol2-t', 'tx-sol2-mock', 'tx-sol2-d',
+                'tx-h-impact', 'tx-chart-title'
+            ];
+
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = t[id.replace('tx-', '').replace(/-/g, '_')] || t[id.replace('tx-', '')];
+            });
+            
+            // Special update for duration
+            const durationEl = document.getElementById('tx-duration');
+            if (durationEl) {
+                durationEl.textContent = t.duration;
+            }
+
+
+            // Update Map Labels
+            updateMapLabels(lang);
+
+            // Update Chart
+            initChart();
+
+            // Toggle Button Styles
+            const btnJa = document.getElementById('btn-ja');
+            const btnEn = document.getElementById('btn-en');
+            
+            if(lang === 'ja') {
+                btnJa.className = "px-4 py-2 text-sm font-bold transition-colors bg-blue-600 text-white";
+                btnEn.className = "px-4 py-2 text-sm font-bold transition-colors text-gray-600 hover:bg-gray-100";
+            } else {
+                btnEn.className = "px-4 py-2 text-sm font-bold transition-colors bg-blue-600 text-white";
+                btnJa.className = "px-4 py-2 text-sm font-bold transition-colors text-gray-600 hover:bg-gray-100";
+            }
+        }
+
+        window.onload = function() {
+            switchLang('ja');
+        };
+    </script>
+</body>
+</html>
