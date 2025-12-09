@@ -1,567 +1,1105 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UX Portfolio: Meta Ads Manager IA Improvement</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: "Meta Clean" - Slate (Base), Blue (Primary #1877F2), Teal (Success), Red (Error) -->
-    <!-- Application Structure Plan:
-         1. Hero Section: Project Title, Role, Duration, and high-level Goal.
-         2. Problem Space: 3 Cards highlighting the core structural issues (focusing on Irreversibility).
-         3. User Research (Persona & Journey): Visualized Persona card and a CSS-based Customer Journey Map showing the emotional dip.
-         4. Solution Concepts: Visual representation of the "Account Map" and "Contextual Warnings".
-         5. Business Impact: Bar charts projecting the expected improvements in efficiency and error reduction.
-    -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
-        body { font-family: 'Noto Sans JP', sans-serif; background-color: #F0F2F5; color: #1C1E21; }
-        
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 300px;
-        }
+  <meta charset="UTF-8" />
+  <title>Untangling the Knot – UX Case Study for Meta Ads Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f7f4ee;
+      --bg-alt: #ffffff;
+      --bg-soft: #f1f4fb;
+      --border: #dde1ec;
+      --text-main: #1c1e21;
+      --text-sub: #606770;
+      --accent-blue: #0054b4;
+      --accent-green: #16a34a;
+      --accent-orange: #e5862f;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 6px 20px rgba(0,0,0,0.06);
+    }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border: 1px solid #DADDE1;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* Journey Map Styling */
-        .journey-point {
-            position: relative;
-            z-index: 10;
-        }
-        .journey-line {
-            position: absolute;
-            top: 2rem;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: #E4E6EB;
-            z-index: 0;
-        }
-        
-        /* Tree Node Styling for Solution */
-        .tree-node {
-            background: #FFFFFF;
-            border: 1px solid #CCD0D5;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin: 4px 0;
-            position: relative;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        .tree-connector {
-            width: 2px;
-            background: #CCD0D5;
-            margin: 0 auto;
-        }
-        .tree-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-        }
-        .tree-row {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            gap: 12px;
-        }
-        .node-label {
-            margin-left: 6px;
-            font-weight: 600;
-        }
-    </style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #fdfaf4, #f1f3fb);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 24px auto 40px;
+      padding: 0 20px 40px;
+    }
+
+    header.hero {
+      background: var(--bg-alt);
+      border-radius: 28px;
+      padding: 32px 32px 28px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.3fr);
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      line-height: 1.2;
+      color: var(--accent-blue);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+      max-width: 420px;
+      color: var(--text-sub);
+      margin-bottom: 18px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #e0e2ef;
+      background: #f7f8fd;
+      color: var(--text-sub);
+    }
+
+    .hero-meta {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .hero-meta span + span::before {
+      content: "•";
+      margin: 0 6px;
+      color: #c1c5d3;
+    }
+
+    .hero-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .knot {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(245,180,92,0.2), transparent 60%),
+        radial-gradient(circle at 70% 70%, rgba(56,189,148,0.2), transparent 60%),
+        #fffaf3;
+      border: 2px solid #f3e0c7;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .knot-line {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 3px dashed rgba(229,134,47,0.7);
+      top: -40px;
+      left: -40px;
+      transform: rotate(-12deg);
+    }
+
+    .knot-line:nth-child(2) {
+      border-style: solid;
+      border-color: rgba(22,163,74,0.55);
+      width: 220px;
+      height: 220px;
+      top: -20px;
+      left: -10px;
+      transform: rotate(24deg);
+    }
+
+    .knot-label {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .hero-curve {
+      position: absolute;
+      bottom: -6px;
+      left: -12px;
+      right: -12px;
+      height: 24px;
+      background: linear-gradient(
+        90deg,
+        var(--accent-orange),
+        #d8b653,
+        var(--accent-green)
+      );
+      border-radius: 999px;
+      opacity: 0.5;
+      filter: blur(6px);
+    }
+
+    /* Sections */
+
+    section {
+      margin-top: 32px;
+    }
+
+    .section-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent-blue);
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .section-intro {
+      font-size: 14px;
+      color: var(--text-sub);
+      max-width: 720px;
+    }
+
+    /* Layout helpers */
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr);
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: var(--bg-alt);
+      border-radius: var(--radius-lg);
+      padding: 18px 18px 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-soft {
+      background: var(--bg-soft);
+      border-style: dashed;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-blue);
+      margin-bottom: 4px;
+    }
+
+    .persona-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .persona-role {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    .list-header {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    ul {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-left: 18px;
+      margin-bottom: 4px;
+    }
+
+    li {
+      margin-bottom: 3px;
+    }
+
+    .quote {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .quote strong {
+      color: var(--accent-orange);
+      font-weight: 700;
+    }
+
+    /* Metrics */
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      background: var(--bg-alt);
+      border-radius: var(--radius-md);
+      padding: 12px 12px 10px;
+      border: 1px solid #e2e5f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      font-size: 12px;
+    }
+
+    .metric-label {
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 2px;
+      color: var(--accent-blue);
+    }
+
+    .metric-note {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    /* Pain map */
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .pain-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    /* Process */
+
+    .process-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .process-step {
+      background: var(--bg-alt);
+      border-radius: 999px;
+      padding: 10px 14px;
+      border: 1px solid #dde0ef;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #f1f4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--accent-blue);
+    }
+
+    .process-step strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    /* Design principles */
+
+    .principles-row {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .principle-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .before-after {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .before-after span {
+      display: block;
+    }
+
+    .before-label {
+      color: #b45309;
+      font-weight: 600;
+    }
+
+    .after-label {
+      color: var(--accent-green);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Before / after panel */
+
+    .ba-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1.1fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .ba-panel h4 {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .ba-tag {
+      display: inline-block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #e4d4c4;
+      color: #b45309;
+      margin-bottom: 6px;
+    }
+
+    .ba-tag.after {
+      border-color: #c4e3ce;
+      color: var(--accent-green);
+    }
+
+    /* Results table */
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .result-block {
+      background: var(--bg-alt);
+      border-radius: var(--radius-md);
+      padding: 12px 12px 10px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .result-label {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .result-before-after {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .before-value {
+      color: #ea580c;
+      font-weight: 600;
+    }
+
+    .after-value {
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .result-note {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .impact-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 12px;
+    }
+
+    .impact-table th,
+    .impact-table td {
+      border: 1px solid #e2e5f0;
+      padding: 6px 8px;
+    }
+
+    .impact-table th {
+      background: #f7f8fd;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .impact-growth {
+      color: var(--accent-green);
+      font-weight: 700;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e6f6eb;
+      color: var(--accent-green);
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #c5e8cf;
+      margin-left: 6px;
+    }
+
+    /* Lessons */
+
+    .lessons-row {
+      display: grid;
+      grid-template-columns: repeat(3,minmax(0,1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .lesson {
+      background: var(--bg-alt);
+      border-radius: var(--radius-md);
+      padding: 14px 12px 12px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .lesson-number {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: #f1f4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--accent-blue);
+      margin-bottom: 6px;
+    }
+
+    .lesson-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    /* Outro */
+
+    .outro {
+      margin-top: 32px;
+      background: var(--bg-alt);
+      border-radius: 24px;
+      padding: 20px 22px;
+      border: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    .outro h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: var(--accent-blue);
+    }
+
+    .outro p {
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .rocket-line {
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      border-radius: 999px;
+      margin-top: 12px;
+      position: relative;
+    }
+
+    .rocket {
+      position: absolute;
+      right: 0;
+      top: -8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50% 50% 50% 0;
+      border: 2px solid var(--accent-green);
+      transform: rotate(45deg);
+    }
+
+    .rocket::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-green);
+      border-color: transparent transparent var(--accent-green) var(--accent-green);
+      left: 3px;
+      top: 3px;
+    }
+
+    .outro-links {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 8px;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 900px) {
+      header.hero {
+        grid-template-columns: minmax(0,1fr);
+      }
+      .hero-visual {
+        order: -1;
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .two-col,
+      .ba-row,
+      .results-grid,
+      .lessons-row,
+      .principles-row,
+      .process-row,
+      .metrics-row,
+      .pain-grid,
+      .outro {
+        grid-template-columns: minmax(0,1fr);
+      }
+      .metrics-row {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
+      .process-row {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+      }
+      .principles-row {
+        grid-template-columns: minmax(0,1fr);
+      }
+      .results-grid {
+        grid-template-columns: minmax(0,1fr);
+      }
+    }
+  </style>
 </head>
-<body class="antialiased">
-
-    <!-- LANGUAGE TOGGLE -->
-    <div class="fixed top-6 right-6 z-50 flex bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-        <button onclick="switchLang('ja')" id="btn-ja" class="px-4 py-2 text-sm font-bold transition-colors bg-blue-600 text-white">JA</button>
-        <button onclick="switchLang('en')" id="btn-en" class="px-4 py-2 text-sm font-bold transition-colors text-gray-600 hover:bg-gray-100">EN</button>
-    </div>
-
-    <!-- HERO SECTION -->
-    <header class="bg-white pb-12 pt-20 px-6 border-b border-gray-200">
-        <div class="max-w-5xl mx-auto">
-            <div class="flex items-center gap-2 mb-4">
-                <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">UX Portfolio Case Study</span>
-                <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full" id="tx-date">Dec 2025</span>
-            </div>
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-6 text-gray-900 leading-tight" id="tx-title">
-                Meta Ads Manager: <br>
-                <span class="text-blue-600">Account Structure & IA Improvement</span>
-            </h1>
-            <p class="text-lg text-gray-600 max-w-2xl mb-8 leading-relaxed" id="tx-summary">
-                Redesigning the Information Architecture to eliminate structural confusion, prevent irreversible setup errors, and empower users to manage campaigns with confidence.
-            </p>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-gray-100 pt-6">
-                <div>
-                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">My Role</p>
-                    <p class="font-bold text-gray-800" id="tx-role">Technical Support / UX Designer</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Focus</p>
-                    <p class="font-bold text-gray-800" id="tx-focus">Information Architecture (IA)</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Duration</p>
-                    <p class="font-bold text-gray-800" id="tx-duration">1 Week Sprint</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Tools</p>
-                    <p class="font-bold text-gray-800">Figma, Usability Testing</p>
-                </div>
-            </div>
+<body>
+  <div class="page">
+    <!-- Hero -->
+    <header class="hero">
+      <div>
+        <div class="hero-title">
+          Untangling the Knot: A UX Case Study for Meta Ads Manager
         </div>
+        <div class="hero-subtitle">
+          Guiding users from confusion to clarity in business asset management.
+        </div>
+
+        <div class="hero-tags">
+          <span class="tag">Meta Ads Manager</span>
+          <span class="tag">Business Asset Setup</span>
+          <span class="tag">UX Case Study</span>
+        </div>
+
+        <div class="hero-meta">
+          <span>Role: UX Designer &amp; Researcher</span>
+          <span>Focus: Business setup &amp; confidence</span>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="knot">
+          <div class="knot-line"></div>
+          <div class="knot-line"></div>
+          <div class="knot-label">From knot to clear path</div>
+        </div>
+        <div class="hero-curve"></div>
+      </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 py-16 space-y-20">
+    <!-- Problem -->
+    <section>
+      <div class="section-label">Problem</div>
+      <h2>For marketers, the path to running ads feels like a maze.</h2>
+      <p class="section-intro">
+        Creating an ad in Meta Ads Manager is relatively straightforward. Getting to that point is not.
+        The way Business Portfolios, Ad Accounts, Pages, Pixels and Catalogs connect is opaque, and this
+        hidden structure becomes a very visible source of stress. Intermediate users were stalling out
+        before they ever reached the campaign screen.
+      </p>
 
-        <!-- 1. THE PROBLEM -->
-        <section>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <span class="bg-red-100 text-red-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
-                <span id="tx-h-problem">The Core Problem</span>
-            </h2>
-            <p class="text-gray-600 mb-8 ml-11" id="tx-problem-desc">
-                Users cannot intuitively understand the complex linking between assets (Ad Accounts, Business Portfolios, Pixels). This invisible hierarchy leads to critical operational failures.
+      <div class="two-col">
+        <div class="card">
+          <div class="eyebrow">Persona</div>
+          <div class="persona-name">Meet Hana, a driven entrepreneur stalled by complexity.</div>
+          <div class="persona-role">Small business owner running a select shop with Shopify.</div>
+
+          <p class="list-header">Goal</p>
+          <ul>
+            <li>Correctly link her Shopify product catalog to Facebook and Instagram.</li>
+            <li>Attach the right Page, accounts and a working Pixel to run effective ads.</li>
+          </ul>
+
+          <p class="list-header">Core frustration</p>
+          <p class="quote">
+            <strong>“I just want to run ads.”</strong> She feels lost in a sea of settings and is afraid of
+            clicking something irreversible. Help Center articles do not match her specific situation.
+          </p>
+        </div>
+
+        <div>
+          <div class="card card-soft">
+            <div class="eyebrow">Initial usability test (6 participants)</div>
+            <p style="font-size:13px; color:var(--text-sub);">
+              We ran a moderated remote usability study with intermediate-level users tasked with
+              connecting business assets and completing a basic setup.
             </p>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 ml-11">
-                <!-- Problem 1 -->
-                <div class="card p-6 border-t-4 border-t-gray-400">
-                    <div class="text-3xl mb-4">😰</div>
-                    <h3 class="font-bold text-gray-800 mb-2" id="tx-prob1-t">Anxiety & Misoperation</h3>
-                    <p class="text-sm text-gray-600" id="tx-prob1-d">"Is this the right place?" Users hesitate to make changes due to unclear impact scope.</p>
-                </div>
-                <!-- Problem 2 -->
-                <div class="card p-6 border-t-4 border-t-gray-400">
-                    <div class="text-3xl mb-4">🏚️</div>
-                    <h3 class="font-bold text-gray-800 mb-2" id="tx-prob2-t">Inefficient Operations</h3>
-                    <p class="text-sm text-gray-600" id="tx-prob2-d">Duplicate accounts and chaotic structures make analysis and handover impossible.</p>
-                </div>
-                <!-- Problem 3 (Crucial Correction applied here) -->
-                <div class="card p-6 border-t-4 border-t-red-500 bg-red-50">
-                    <div class="text-3xl mb-4">🔒</div>
-                    <h3 class="font-bold text-red-700 mb-2" id="tx-prob3-t">Fatal Irreversibility</h3>
-                    <p class="text-sm text-red-800" id="tx-prob3-d">
-                        **The link between an Ad Account and a Business Portfolio is irreversible.** This permanently blocks permission handover if an admin leaves.
-                    </p>
-                </div>
+            <div class="metrics-row">
+              <div class="metric">
+                <div class="metric-label">Task success rate</div>
+                <div class="metric-value">25%</div>
+                <div class="metric-note">Only 2 of 6 users could complete the core setup tasks.</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Avg. time on task</div>
+                <div class="metric-value">~48 min</div>
+                <div class="metric-note">Workflows intended to take 10–15 minutes stretched to almost an hour.</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Navigation confusion</div>
+                <div class="metric-value">100%</div>
+                <div class="metric-note">Every participant got lost or stuck due to unclear navigation.</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">SUS score</div>
+                <div class="metric-value">30–40</div>
+                <div class="metric-note">The experience was consistently described as “painful”.</div>
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <!-- 2. USER RESEARCH (PERSONA & JOURNEY) -->
-        <section>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
-                <span id="tx-h-research">User Research & Persona</span>
-            </h2>
-            
-            <!-- Persona Card -->
-            <div class="ml-11 mt-8 mb-12 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col md:flex-row">
-                <div class="bg-gray-100 p-8 md:w-1/3 flex flex-col items-center justify-center text-center border-r border-gray-200">
-                    <div class="w-24 h-24 bg-blue-200 rounded-full flex items-center justify-center text-4xl mb-4">👩🏻‍💼</div>
-                    <h3 class="text-xl font-bold text-gray-800" id="tx-p-name">Aya (32)</h3>
-                    <p class="text-sm text-gray-500 mb-4" id="tx-p-role">Marketing @ EC Company</p>
-                    <div class="text-xs bg-white px-3 py-1 rounded-full border border-gray-300">Mid-level Operator</div>
-                </div>
-                <div class="p-8 md:w-2/3">
-                    <h4 class="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2" id="tx-p-context-h">Context</h4>
-                    <p class="text-sm text-gray-600 mb-6" id="tx-p-context">Entrusted with operations by a novice owner, but stuck because she logged into an account that is disconnected from the business structure. Ads are stopped.</p>
-                    
-                    <h4 class="font-bold text-gray-800 mb-3 border-b border-gray-100 pb-2" id="tx-p-frust-h">Frustrations</h4>
-                    <ul class="text-sm text-red-600 space-y-2 font-medium">
-                        <li id="tx-p-frust-1">"I'm too scared to touch settings."</li>
-                        <li id="tx-p-frust-2">"I don't know which setting affects what."</li>
-                        <li id="tx-p-frust-3">"I can't define the rules myself."</li>
-                    </ul>
-                </div>
-            </div>
+    <!-- Pain map -->
+    <section>
+      <div class="section-label">Pain points</div>
+      <h2>The invisible structure was creating very visible pain.</h2>
+      <p class="section-intro">
+        Research showed that most of the friction came from how users <em>understood</em> the system—not from
+        campaign creation itself. Four recurring pain themes emerged:
+      </p>
 
-            <!-- CSS Journey Map -->
-            <div class="ml-11">
-                <h3 class="text-lg font-bold text-gray-800 mb-6" id="tx-h-journey">User Journey: The Path to Despair</h3>
-                <div class="relative py-10">
-                    <div class="journey-line"></div>
-                    <div class="grid grid-cols-4 gap-4">
-                        <!-- Phase 1 -->
-                        <div class="journey-point flex flex-col items-center text-center">
-                            <div class="w-12 h-12 rounded-full bg-green-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😊</div>
-                            <h4 class="font-bold text-sm mb-1" id="tx-j1-t">Planning</h4>
-                            <p class="text-xs text-gray-500" id="tx-j1-d">New campaign needs arise.</p>
-                        </div>
-                        <!-- Phase 2 -->
-                        <div class="journey-point flex flex-col items-center text-center">
-                            <div class="w-12 h-12 rounded-full bg-yellow-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😐</div>
-                            <h4 class="font-bold text-sm mb-1" id="tx-j2-t">Structure Check</h4>
-                            <p class="text-xs text-gray-500" id="tx-j2-d">Using existing account (Personal?). Can't find Business Settings.</p>
-                        </div>
-                        <!-- Phase 3 -->
-                        <div class="journey-point flex flex-col items-center text-center">
-                            <div class="w-12 h-12 rounded-full bg-orange-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😡</div>
-                            <h4 class="font-bold text-sm mb-1 text-orange-600" id="tx-j3-t">Forced Misdirection</h4>
-                            <p class="text-xs text-orange-600 font-bold" id="tx-j3-d">Forced to "Select Business" screen, but account is not linked. Context Lost.</p>
-                        </div>
-                        <!-- Phase 4 -->
-                        <div class="journey-point flex flex-col items-center text-center">
-                            <div class="w-12 h-12 rounded-full bg-red-100 text-2xl flex items-center justify-center border-4 border-white shadow-sm mb-4">😭</div>
-                            <h4 class="font-bold text-sm mb-1 text-red-700" id="tx-j4-t">Operational Block</h4>
-                            <p class="text-xs text-red-700 font-bold" id="tx-j4-d">Cannot link due to "Same Email". Irreversible setup creates permanent risk.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+      <div class="pain-grid">
+        <div class="card">
+          <div class="pain-title">Confusing hierarchy</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            Users could not clearly explain the difference between a Business Manager / Portfolio and an Ad
+            Account. They weren’t sure which layer to adjust when something went wrong.
+          </p>
+        </div>
+        <div class="card">
+          <div class="pain-title">Opaque asset linking</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            It was difficult to see which Page, Pixel, Catalog or Instagram account was connected to which
+            business. Errors like “This Page is owned by another business” came as a surprise.
+          </p>
+        </div>
+        <div class="card">
+          <div class="pain-title">Complex permissions</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            Simple actions, such as adding a partner or designer, took many clicks across multiple screens.
+            People were unsure whether they had given “too much” or “too little” access.
+          </p>
+        </div>
+        <div class="card">
+          <div class="pain-title">Fear of irreversible actions</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            Many users believed that once they connected an asset, it could never be undone.
+            This fear caused hesitation and abandoned sessions at critical decision points.
+          </p>
+        </div>
+      </div>
+    </section>
 
-        <!-- 3. SOLUTION CONCEPTS -->
-        <section>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <span class="bg-teal-100 text-teal-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
-                <span id="tx-h-solution">Design Solution Concepts</span>
-            </h2>
-            <p class="text-gray-600 mb-8 ml-11" id="tx-sol-desc">
-                To solve "Invisible Hierarchy," I propose visualizing the structure and providing explicit context warnings.
-            </p>
+    <!-- Process -->
+    <section>
+      <div class="section-label">Process</div>
+      <h2>From ambiguity to a validated solution through a user-centered process.</h2>
+      <p class="section-intro">
+        To address these issues, we followed a four-stage design process combining qualitative interviews,
+        usage data and iterative prototyping.
+      </p>
 
-            <div class="ml-11 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Concept 1: Account Map -->
-                <div class="card p-6 md:col-span-2">
-                    <h3 class="font-bold text-blue-700 mb-4" id="tx-sol1-t">1. Account Map (Hierarchy Visualization)</h3>
-                    
-                    <!-- NEW DETAILED TREE VISUALIZATION (HTML/CSS) -->
-                    <div class="bg-slate-50 border border-slate-200 rounded p-6 mb-4 overflow-x-auto">
-                        <div class="min-w-[500px] tree-container">
-                            
-                            <!-- 1. Root Node: Business Portfolio -->
-                            <div class="tree-node border-blue-500 bg-blue-100 text-blue-700 px-6 py-3">
-                                🏢<span class="node-label" id="tx-map-business">ビジネスポートフォリオ</span>
-                            </div>
-                            
-                            <div class="tree-connector h-6"></div>
-                            <div class="tree-connector h-4 bg-blue-400"></div>
-                            <div class="tree-connector h-4"></div>
-                            
-                            <!-- 2. Ad Account (Mid Node) -->
-                            <div class="tree-node border-gray-500 bg-white text-gray-800 px-6 py-3">
-                                💰<span class="node-label" id="tx-map-ad-account">広告アカウント</span>
-                            </div>
-                            <!-- Irreversibility Warning -->
-                            <p class="text-xs text-red-500 mt-1 font-bold" id="tx-map-irreversible">← **この紐づきが不可逆性の課題**</p>
-                            
-                            <div class="tree-connector h-6"></div>
+      <div class="process-row">
+        <div class="process-step">
+          <div class="step-icon">1</div>
+          <div>
+            <strong>Research</strong>
+            <span>Online support interviews &amp; moderated usability tests to study behavior and screen flows.</span>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-icon">2</div>
+          <div>
+            <strong>Define</strong>
+            <span>Organized qualitative and quantitative data into pain themes, personas and key insights.</span>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-icon">3</div>
+          <div>
+            <strong>Design</strong>
+            <span>Explored improvements to information architecture and navigation via low-fidelity wires.</span>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-icon">4</div>
+          <div>
+            <strong>Validate</strong>
+            <span>Ran additional usability tests on the prototype to confirm improvements and surface edge cases.</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                            <!-- 3. Branching: Assets (Vertical Connectors) -->
-                            <div class="tree-row mt-4">
-                                <div class="w-1/3 flex flex-col items-center">
-                                    <div class="tree-connector h-4"></div>
-                                    <div class="tree-node bg-teal-50 border-teal-300 text-teal-700">
-                                        📊<span class="node-label" id="tx-map-pixel">Facebook Pixel</span>
-                                    </div>
-                                </div>
-                                <div class="w-1/3 flex flex-col items-center">
-                                    <div class="tree-connector h-4"></div>
-                                    <div class="tree-node bg-teal-50 border-teal-300 text-teal-700">
-                                        🔗<span class="node-label" id="tx-map-page">FB Page / IG Account</span>
-                                    </div>
-                                </div>
-                                <div class="w-1/3 flex flex-col items-center">
-                                    <div class="tree-connector h-4"></div>
-                                    <div class="tree-node bg-teal-50 border-teal-300 text-teal-700">
-                                        🛍️<span class="node-label" id="tx-map-catalog">Catalog</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="tree-connector h-6"></div>
-                            
-                            <!-- 4. Lower Node: Campaign -->
-                            <div class="tree-node border-gray-400 bg-white text-gray-800 px-6 py-3">
-                                📣<span class="node-label" id="tx-map-campaign">Campaign / Ad Set / Ad (運用)</span>
-                            </div>
+    <!-- Principles -->
+    <section>
+      <div class="section-label">Design Principles</div>
+      <h2>Three principles to turn confusion into clarity.</h2>
+      <p class="section-intro">
+        The solution needed to go beyond polishing the UI. It had to shift how people understood and navigated
+        the system itself. We anchored the redesign on three principles:
+      </p>
 
-                        </div>
-                    </div>
-                    <!-- / NEW DETAILED TREE VISUALIZATION -->
+      <div class="principles-row">
+        <div class="card">
+          <div class="principle-title">1. Visualize hidden hierarchies</div>
+          <div class="before-after">
+            <span class="before-label">Before</span>
+            <span>Users had to imagine how assets related to each other with almost no visual support.</span>
+            <span class="after-label">After</span>
+            <span>A tree view made business relationships visible, aligning with users’ mental models.</span>
+          </div>
+        </div>
 
-                    <p class="text-sm text-gray-600" id="tx-sol1-d">
-                        Always display the hierarchy tree at the top of the screen. Highlight the current editing level to prevent context loss.
-                    </p>
-                </div>
+        <div class="card">
+          <div class="principle-title">2. Provide guided diagnosis</div>
+          <div class="before-after">
+            <span class="before-label">Before</span>
+            <span>Users didn’t know where to start and wandered across multiple tools and tabs.</span>
+            <span class="after-label">After</span>
+            <span>Step-by-step diagnostics turned vague errors into a clear, guided fix path.</span>
+          </div>
+        </div>
 
-                <!-- Concept 2: Health Check & Warning (Remains as 1/2 width) -->
-                <div class="card p-6">
-                    <h3 class="font-bold text-blue-700 mb-4" id="tx-sol2-t">2. Structural Health Check</h3>
-                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-4 rounded-r">
-                        <p class="font-bold text-amber-800 text-xs mb-1">⚠️ Structural Warning</p>
-                        <p class="text-xs text-amber-900" id="tx-sol2-mock">
-                            "This Ad Account is NOT linked to the Business Portfolio. Linking is currently blocked."
-                        </p>
-                    </div>
-                    <p class="text-sm text-gray-600" id="tx-sol2-d">
-                        Proactively warn users about structural issues (e.g., isolation, permission conflicts) on the dashboard to prevent dead-ends.
-                    </p>
-                </div>
-            </div>
-        </section>
+        <div class="card">
+          <div class="principle-title">3. Eliminate dead-end errors</div>
+          <div class="before-after">
+            <span class="before-label">Before</span>
+            <span>Errors ended with cold warnings like “You do not have permission.”</span>
+            <span class="after-label">After</span>
+            <span>Each error state included an actionable “Fix” option that converted blockers into tasks.</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <!-- 4. EXPECTED RESULTS (KPIs) -->
-        <section>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
-                <span id="tx-h-impact">Expected Business Impact</span>
-            </h2>
-            <div class="ml-11 mt-8 card p-8">
-                <h3 class="font-bold text-gray-700 mb-6 text-center" id="tx-chart-title">Target Improvements</h3>
-                <div class="chart-container">
-                    <canvas id="impactChart"></canvas>
-                </div>
-            </div>
-        </section>
+    <!-- Transformation -->
+    <section>
+      <div class="section-label">Transformation</div>
+      <h2>From a cluttered dashboard to a clear map.</h2>
+      <p class="section-intro">
+        The previous dashboard surfaced recommendations and metrics, but did little to explain how assets
+        were connected. The redesigned view reframed setup as a map and checklist instead of a black box.
+      </p>
 
-    </main>
+      <div class="ba-row">
+        <div class="card ba-panel">
+          <div class="ba-tag">Before</div>
+          <h4>Fragmented overview</h4>
+          <p style="font-size:13px; color:var(--text-sub);">
+            Asset status was scattered across different tools. Users had no single place to see which
+            Business Portfolio, Ad Account, Page, Pixel and Catalog belonged together.
+          </p>
+        </div>
+        <div class="card ba-panel">
+          <div class="ba-tag after">After</div>
+          <h4>Business connections map</h4>
+          <ul>
+            <li><strong>Visual tree view</strong> shows the relationship between the Business Portfolio, the current Ad Account and all connected assets.</li>
+            <li><strong>Guided “Fix” flow</strong> converts setup errors into a prioritized checklist with one entry point.</li>
+            <li><strong>Plain-language status</strong> replaces jargon with understandable labels like “Ready”, “Needs attention” or “Not connected”.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-    <footer class="bg-white border-t border-gray-200 py-12 mt-12 text-center text-gray-500 text-sm">
-        <p>UX Portfolio Case Study | 2025</p>
-    </footer>
+    <!-- Confidence -->
+    <section>
+      <div class="section-label">Confidence</div>
+      <h2>Designing for confidence, not just completion.</h2>
+      <p class="section-intro">
+        A major insight from testing was that users were not only confused—they were
+        <em>afraid</em> of making irreversible mistakes. Addressing this psychological hurdle
+        required new safety mechanisms.
+      </p>
 
-    <script>
-        const content = {
-            ja: {
-                date: "2025年12月",
-                title: "Meta Ads Manager: <br><span class=\"text-blue-600\">アカウント構造とIAの改善</span>",
-                summary: "情報アーキテクチャ(IA)を再設計し、構造的な混乱を解消。不可逆的な設定ミスを防ぎ、ユーザーが安心してキャンペーンを管理できる状態を目指す。",
-                role: "テクニカルサポート / UXデザイナー",
-                focus: "情報アーキテクチャ (IA)",
-                duration: "2025年12月3日 – 2025年12月10日 (1週間のスプリント)",
-                h_problem: "課題の核心",
-                problem_desc: "ユーザーは、広告アカウント、ビジネスポートフォリオ、ピクセルなどのアセット間の複雑な紐づきを直感的に理解できません。この「見えない階層」が、致命的な運用ミスを引き起こしています。",
-                prob1_t: "誤操作への不安",
-                prob1_d: "「ここを変えて大丈夫？」影響範囲が見えないため、変更をためらい作業が停滞する。",
-                prob2_t: "非効率な運用",
-                prob2_d: "構造が理解できないため、同じ設定の複製ばかり増え、分析や引き継ぎが困難になる。",
-                prob3_t: "致命的な不可逆性",
-                prob3_d: "**「広告アカウント」と「ビジネスポートフォリオ」の紐づきは一度行うと解除できません。** これにより、管理者が退職した際などに権限移譲が永久にブロックされるリスクがあります。",
-                h_research: "ユーザーリサーチ & ペルソナ",
-                p_name: "佐藤 彩 (32)",
-                p_role: "EC事業会社 マーケティング担当",
-                p_context_h: "状況",
-                p_context: "初心者のオーナーから運用を任されたが、ビジネス構造と切り離されたアカウントでログインしてしまい、操作に行き詰まっている。",
-                p_frust_h: "不満・課題",
-                p_frust_1: "「怖くて設定画面を触れない」",
-                p_frust_2: "「どの設定がどこに効くのか分からない」",
-                p_frust_3: "「自分ではルールを決められない」",
-                h_journey: "ユーザージャーニー：絶望への道のり",
-                j1_t: "企画",
-                j1_d: "新しいキャンペーンのニーズ発生",
-                j2_t: "構造検討",
-                j2_d: "既存アカウントを使用（個人？）。ビジネス設定が見当たらない。",
-                j3_t: "強制的な誤誘導",
-                j3_d: "「ビジネスを選択」画面に強制遷移させられるが、紐づくアカウントがないため操作不能に陥る。",
-                j4_t: "運用ブロック",
-                j4_d: "「同一メアド」エラーや、広告アカウントとビジネスポートフォリオの不可逆な紐づきにより、解決不能な状態に。",
-                h_solution: "デザイン解決策のコンセプト",
-                sol_desc: "「見えない階層」を解決するため、構造の視覚化と、文脈に応じた警告表示を提案します。",
-                sol1_t: "1. アカウントマップ（階層の視覚化）",
-                sol1_d: "画面上部に階層ツリーを常時表示。現在地と親子関係をハイライトし、コンテキストの喪失（迷子）を防ぐ。",
-                sol2_t: "2. 構造の健康状態チェック",
-                sol2_mock: "「この広告アカウントはビジネスポートフォリオに紐づいていません。機能が制限されます」",
-                sol2_d: "「孤立したアカウント」や「権限の競合」などの構造的問題を、行き止まりになる前にダッシュボードで警告する。",
-                h_impact: "期待されるビジネスインパクト",
-                chart_title: "改善目標値 (KPI)",
-                chart_labels: ["タスク完了時間短縮", "構造起因のエラー削減", "構造理解度(SUS)"],
-                legend_current: "現状",
-                legend_target: "目標",
-                // New Map Node Labels
-                map_business: "🏢 ビジネスポートフォリオ",
-                map_ad_account: "💰 広告アカウント",
-                map_pixel: "📊 Facebook Pixel",
-                map_page: "🔗 FB Page / IG Account",
-                map_catalog: "🛍️ Catalog",
-                map_campaign: "📣 Campaign / Ad Set / Ad (運用)",
-                map_irreversible: "← **この紐づきが不可逆性の課題**"
-            },
-            en: {
-                date: "Dec 2025",
-                title: "Meta Ads Manager: <br><span class=\"text-blue-600\">Account Structure & IA Improvement</span>",
-                summary: "Redesigning the Information Architecture to eliminate structural confusion, prevent irreversible setup errors, and empower users to manage campaigns with confidence.",
-                role: "Technical Support / UX Designer",
-                focus: "Information Architecture (IA)",
-                duration: "December 3 – December 10, 2025 (1 Week Sprint)",
-                h_problem: "The Core Problem",
-                problem_desc: "Users cannot intuitively understand the complex linking between assets (Ad Accounts, Business Portfolios, Pixels). This invisible hierarchy leads to critical operational failures.",
-                prob1_t: "Anxiety & Misoperation",
-                prob1_d: "\"Is this the right place?\" Users hesitate to make changes due to unclear impact scope.",
-                prob2_t: "Inefficient Operations",
-                prob2_d: "Duplicate accounts and chaotic structures make analysis and handover impossible.",
-                prob3_t: "Fatal Irreversibility",
-                prob3_d: "**The link between an Ad Account and a Business Portfolio is irreversible.** This permanently blocks permission handover if an admin leaves.",
-                h_research: "User Research & Persona",
-                p_name: "Aya (32)",
-                p_role: "Marketing @ EC Company",
-                p_context_h: "Context",
-                p_context: "Entrusted with operations by a novice owner, but stuck because she logged into an account that is disconnected from the business structure. Ads are stopped.",
-                p_frust_h: "Frustrations",
-                p_frust_1: "\"I'm too scared to touch settings.\"",
-                p_frust_2: "\"I don't know which setting affects what.\"",
-                p_frust_3: "\"I can't define the rules myself.\"",
-                h_journey: "User Journey: The Path to Despair",
-                j1_t: "Planning",
-                j1_d: "New campaign needs arise.",
-                j2_t: "Structure Check",
-                j2_d: "Using existing account (Personal?). Can't find Business Settings.",
-                j3_t: "Forced Misdirection",
-                j3_d: "Forced to \"Select Business\" screen, but account is not linked. Context Lost.",
-                j4_t: "Operational Block",
-                j4_d: "Blocked by \"Same Email\" error or irreversible Ad Account-Business Portfolio linking risk.",
-                h_solution: "Design Solution Concepts",
-                sol_desc: "To solve \"Invisible Hierarchy,\" I propose visualizing the structure and providing explicit context warnings.",
-                sol1_t: "1. Account Map (Hierarchy Visualization)",
-                sol1_d: "Always display the hierarchy tree at the top. Highlight the current editing level to prevent context loss.",
-                sol2_t: "2. Structural Health Check",
-                sol2_mock: "\"This Ad Account is NOT linked to the Business Portfolio. Features are limited.\"",
-                sol2_d: "Proactively warn users about structural issues (e.g., isolation, permission conflicts) before they hit a dead-end.",
-                h_impact: "Expected Business Impact",
-                chart_title: "Target Improvements",
-                chart_labels: ["Time Reduction", "Error Reduction", "Understanding (SUS)"],
-                legend_current: "Current",
-                legend_target: "Target",
-                // New Map Node Labels
-                map_business: "🏢 Business Portfolio",
-                map_ad_account: "💰 Ad Account",
-                map_pixel: "📊 Facebook Pixel",
-                map_page: "🔗 FB Page / IG Account",
-                map_catalog: "🛍️ Catalog",
-                map_campaign: "📣 Campaign / Ad Set / Ad",
-                map_irreversible: "← **This link is Irreversible**"
-            }
-        };
+      <div class="two-col">
+        <div class="card">
+          <div class="eyebrow">Need for a sandbox</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            Participants expressed a strong desire for a safe environment where they could simulate the effect of
+            connecting assets before committing changes to production.
+          </p>
+          <ul>
+            <li>Sandbox mode mirrors the real account but labels it clearly as “simulation”.</li>
+            <li>Users can explore different asset pairings without impacting live campaigns.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Undo as a first-class feature</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            To reduce anxiety around permanent decisions, we paired sandboxing with a time-boxed “undo”
+            window. This shifted the experience from “If I click this, I’m stuck” to
+            “I can try this and revert if needed”.
+          </p>
+          <ul>
+            <li>Clear messaging: “You’ll have a 24-hour period to reverse this change.”</li>
+            <li>System-level support for rolling back recent asset connections.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-        let currentLang = 'ja';
-        let impactChart;
+    <!-- Results -->
+    <section>
+      <div class="section-label">Results</div>
+      <h2>A dramatic turnaround in user success.</h2>
+      <p class="section-intro">
+        Post-redesign usability testing showed a complete reversal of the initial findings.
+        Users were not only completing tasks; they were doing so quickly and with confidence.
+      </p>
 
-        function initChart() {
-            const ctx = document.getElementById('impactChart').getContext('2d');
-            if(impactChart) impactChart.destroy();
+      <div class="results-grid">
+        <div class="result-block">
+          <div class="result-label">Metric 1: Task success rate</div>
+          <div class="result-before-after">
+            <span class="before-value">25% (2/6)</span>
+            <span style="font-size:11px; color:#9ca3af;">→</span>
+            <span class="after-value">100% (6/6)</span>
+          </div>
+          <div class="result-note">
+            4× improvement: all participants successfully completed the technical setup after the redesign.
+          </div>
+        </div>
+        <div class="result-block">
+          <div class="result-label">Metric 2: Avg. completion time</div>
+          <div class="result-before-after">
+            <span class="before-value">~48 min</span>
+            <span style="font-size:11px; color:#9ca3af;">→</span>
+            <span class="after-value">~12 min</span>
+          </div>
+          <div class="result-note">
+            75% reduction in time: flows that previously took nearly an hour now completed in under 15 minutes.
+          </div>
+        </div>
+        <div class="result-block">
+          <div class="result-label">Metric 3: Navigation confusion</div>
+          <div class="result-before-after">
+            <span class="before-value">100%</span>
+            <span style="font-size:11px; color:#9ca3af;">→</span>
+            <span class="after-value">0%</span>
+          </div>
+          <div class="result-note">
+            Reports of “feeling lost” dropped to zero during post-launch usability checks.
+          </div>
+        </div>
+      </div>
 
-            impactChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: content[currentLang].chart_labels,
-                    datasets: [
-                        {
-                            label: content[currentLang].legend_current,
-                            data: [0, 40, 40], // Baseline (illustrative)
-                            backgroundColor: '#CBD5E1', 
-                            borderRadius: 4
-                        },
-                        {
-                            label: content[currentLang].legend_target,
-                            data: [30, 10, 80], // Targets: 30% reduction, Error down to 10%, SUS up to 80
-                            backgroundColor: '#2563EB', // Blue 600
-                            borderRadius: 4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true, max: 100, grid: { color: '#F3F4F6' } },
-                        x: { grid: { display: false } }
-                    },
-                    plugins: {
-                        legend: { position: 'top' }
-                    }
-                }
-            });
-        }
-        
-        function updateMapLabels(lang) {
-            const t = content[lang];
-            const mapElements = {
-                'tx-map-business': t.map_business,
-                'tx-map-ad-account': t.map_ad_account,
-                'tx-map-pixel': t.map_pixel,
-                'tx-map-page': t.map_page,
-                'tx-map-catalog': t.map_catalog,
-                'tx-map-campaign': t.map_campaign,
-                'tx-map-irreversible': t.map_irreversible
-            };
+      <div class="card" style="margin-top:18px;">
+        <div class="eyebrow">Clarity drives growth</div>
+        <p style="font-size:13px; color:var(--text-sub);">
+          Once setup barriers were removed and measurement issues resolved, improved user experience
+          correlated with higher advertising investment across all segments.
+        </p>
 
-            for (const id in mapElements) {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = mapElements[id];
-            }
-        }
+        <table class="impact-table">
+          <thead>
+            <tr>
+              <th>User group</th>
+              <th>Before</th>
+              <th>After</th>
+              <th>Growth</th>
+              <th>Primary driver</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Target segment (Start-ups)</td>
+              <td>¥0.45M</td>
+              <td>¥1.5M</td>
+              <td class="impact-growth">3.3×</td>
+              <td>Removing setup barriers.</td>
+            </tr>
+            <tr>
+              <td>Intermediate (B2B / SaaS)</td>
+              <td>¥0.5M</td>
+              <td>¥1.0M</td>
+              <td class="impact-growth">2.0×</td>
+              <td>Fixing measurement issues.</td>
+            </tr>
+            <tr>
+              <td>Agency (experts)</td>
+              <td>¥13.0M</td>
+              <td>¥15.6M</td>
+              <td class="impact-growth">1.2×</td>
+              <td>Optimizing management tools.</td>
+            </tr>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td><strong>¥14.0M</strong></td>
+              <td><strong>¥18.1M</strong></td>
+              <td class="impact-growth">+30%</td>
+              <td>Combined effect across all segments.</td>
+            </tr>
+          </tbody>
+        </table>
 
+        <div style="margin-top:8px; font-size:12px; color:var(--accent-green);">
+          Overall increase in total ad spend
+          <span class="badge-pill">+30%</span>
+        </div>
+      </div>
+    </section>
 
-        function switchLang(lang) {
-            currentLang = lang;
-            const t = content[lang];
-            
-            // Text Updates
-            const ids = [
-                'tx-date', 'tx-title', 'tx-summary', 'tx-role', 'tx-focus', 'tx-duration',
-                'tx-h-problem', 'tx-problem-desc', 'tx-prob1-t', 'tx-prob1-d', 'tx-prob2-t', 'tx-prob2-d', 'tx-prob3-t', 'tx-prob3-d',
-                'tx-h-research', 'tx-p-name', 'tx-p-role', 'tx-p-context-h', 'tx-p-context', 'tx-p-frust-h', 'tx-p-frust-1', 'tx-p-frust-2', 'tx-p-frust-3',
-                'tx-h-journey', 'tx-j1-t', 'tx-j1-d', 'tx-j2-t', 'tx-j2-d', 'tx-j3-t', 'tx-j3-d', 'tx-j4-t', 'tx-j4-d',
-                'tx-h-solution', 'tx-sol-desc', 'tx-sol1-t', 'tx-sol1-d', 'tx-sol2-t', 'tx-sol2-mock', 'tx-sol2-d',
-                'tx-h-impact', 'tx-chart-title'
-            ];
+    <!-- Lessons & Future -->
+    <section>
+      <div class="section-label">Reflection</div>
+      <h2>Key lessons and future opportunities.</h2>
+      <p class="section-intro">
+        Beyond immediate metrics, the project highlighted broader truths about designing for complex systems.
+      </p>
 
-            ids.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.innerHTML = t[id.replace('tx-', '').replace(/-/g, '_')] || t[id.replace('tx-', '')];
-            });
-            
-            // Special update for duration
-            const durationEl = document.getElementById('tx-duration');
-            if (durationEl) {
-                durationEl.textContent = t.duration;
-            }
+      <div class="lessons-row">
+        <div class="lesson">
+          <div class="lesson-number">1</div>
+          <div class="lesson-title">Terminology is a persistent barrier.</div>
+          <p>
+            Even with a clearer UI, Meta-specific terms like “Asset” or “Catalog” remained difficult.
+            Layout and wording need to be designed together to reduce cognitive load.
+          </p>
+        </div>
+        <div class="lesson">
+          <div class="lesson-number">2</div>
+          <div class="lesson-title">Fear of irreversible actions is real.</div>
+          <p>
+            Users’ anxiety stayed high even once the process became clearer. Designing for confidence means
+            acknowledging and directly addressing this fear.
+          </p>
+        </div>
+        <div class="lesson">
+          <div class="lesson-number">3</div>
+          <div class="lesson-title">Self-service must handle complex migrations.</div>
+          <p>
+            Users with legacy setups still required human support, revealing a gap in self-service for
+            non-standard cases and migration paths.
+          </p>
+        </div>
+      </div>
 
+      <div class="two-col" style="margin-top:22px;">
+        <div class="card">
+          <div class="eyebrow">Proposed backend enhancements</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            To avoid depending solely on manual cleanup, the system could proactively suggest
+            account hygiene actions: automatic archiving for unused assets, and a “forced ownership
+            request” flow when an administrator is absent.
+          </p>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Designing a true sandbox</div>
+          <p style="font-size:13px; color:var(--text-sub);">
+            Confidence can be strengthened by letting users simulate the post-migration state inside Meta
+            tools themselves. A full sandbox environment paired with robust undo would let marketers explore
+            options without fear.
+          </p>
+        </div>
+      </div>
+    </section>
 
-            // Update Map Labels
-            updateMapLabels(lang);
-
-            // Update Chart
-            initChart();
-
-            // Toggle Button Styles
-            const btnJa = document.getElementById('btn-ja');
-            const btnEn = document.getElementById('btn-en');
-            
-            if(lang === 'ja') {
-                btnJa.className = "px-4 py-2 text-sm font-bold transition-colors bg-blue-600 text-white";
-                btnEn.className = "px-4 py-2 text-sm font-bold transition-colors text-gray-600 hover:bg-gray-100";
-            } else {
-                btnEn.className = "px-4 py-2 text-sm font-bold transition-colors bg-blue-600 text-white";
-                btnJa.className = "px-4 py-2 text-sm font-bold transition-colors text-gray-600 hover:bg-gray-100";
-            }
-        }
-
-        window.onload = function() {
-            switchLang('ja');
-        };
-    </script>
+    <!-- Outro -->
+    <section class="outro">
+      <div>
+        <h3>From a labyrinth to a launchpad.</h3>
+        <p>
+          By untangling complexity and designing for confidence, we turned a frustrating setup barrier into
+          a clear starting point for growth. The case study demonstrates that investing in clarity for users
+          is a direct investment in the success of the platform.
+        </p>
+        <div class="rocket-line">
+          <div class="rocket"></div>
+        </div>
+      </div>
+      <div>
+        <p class="outro-links">
+          Portfolio / Website: <em>[your-portfolio-url.com]</em><br />
+          LinkedIn: <em>[linkedin.com/in/your-profile]</em>
+        </p>
+        <p class="outro-links" style="margin-top:10px;">
+          This HTML page is designed to be printed or exported as a PDF as part of a UX portfolio.
+        </p>
+      </div>
+    </section>
+  </div>
 </body>
 </html>
